@@ -1,0 +1,24 @@
+{{- if eq .Pipeline.Status "ok" -}}
+Your pipeline #{{ .Pipeline.ID }} passed!
+    {{ template "pipelineInfo" . }}
+{{- else -}}
+Your pipeline #{{ .Pipeline.ID }} has failed!
+    {{ template "failureInfo" . }}
+{{- end }}
+
+{{- define "failureInfo" -}}
+    {{ template "pipelineInfo" . }}
+    {{- range .Pipeline.FailedJobs }}
+        Stage: {{ .Stage }}, Job {{ .Name }}
+            {{- range lastLines .RunnerLog }}
+            {{.}}
+            {{- end }}
+{{ end }}
+{{- end -}}
+
+{{- define "pipelineInfo" -}}
+    Project:      {{ .Project.GroupID }}/{{ .Project.ID }}
+    Branch:       🌿 {{ .Branch }}
+    Commit:       {{ .Commit.Hash | printf "%.8s" }} {{ .Commit.Message }}
+    CommitAuthor: {{ .Commit.Author }}
+{{- end -}}
